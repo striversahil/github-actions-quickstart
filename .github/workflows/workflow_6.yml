@@ -1,0 +1,25 @@
+name: sixth_workflow
+
+on: 
+  push:
+    branches:
+      - 'main'
+      - 'releases/**'
+  workflow_dispatch:
+  schedule:
+  - cron: '30/5 * * * *'
+  pull_request:
+    types: 
+      - opened
+      - synchronize
+
+jobs:
+    job_A:
+        name: Job A
+        runs-on: ubuntu-latest
+        steps:
+            - name: Triggering a job
+              run: |
+                date
+                echo "Job A is running"
+                echo "This job is triggered by a ${{ github.event_name }} event"

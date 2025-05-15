@@ -1,0 +1,20 @@
+name: seventh_workflow
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+    job_A:
+        name: Job A
+        runs-on: ubuntu-latest
+        steps:
+            - name: Long running job
+              timeout-minutes: 1
+              run: |
+                echo "Job A is running"
+                sleep 300s

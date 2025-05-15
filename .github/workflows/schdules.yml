@@ -1,0 +1,83 @@
+name: Scheduled Workflow
+
+on: 
+    # push:
+    workflow_dispatch:
+    # schedule:
+    #     - cron: "47 16 11 * *"
+
+jobs:
+    job_A:
+        strategy:
+            fail-fast: false
+            # max-parallel: 2
+            matrix:
+                os:
+                    - ubuntu-latest
+                    - ubuntu-20.04
+                message: 
+                    - first
+                    - second 
+                exclude: 
+                    - os: ubuntu-latest
+                      message: second
+                include: 
+                    - os: ubuntu-latest
+                      message: third
+        runs-on:  ${{ matrix.os }}
+        timeout-minutes: 2
+        concurrency:
+            group: ${{ matrix.os }}-${{ matrix.message }}
+            cancel-in-progress: true
+        steps:
+            - name: Welcome message
+              run: echo 'My ${{ matrix.message }} Scheduled Github Actions Job'
+
+            - name: Check date and time
+              run: date
+
+            - name: Increase pipeline time
+              timeout-minutes: 1
+              run: sleep 20
+
+            - name: Increase pipeline time again
+              timeout-minutes: 1
+              run: sleep 20
+
+            - name: Dump strategy context
+              env:
+                STRATEGY_CONTEXT: ${{ toJson(strategy) }}
+              run: echo $STRATEGY_CONTEXT
+
+            - name: Dump matrix context
+              env:
+                MATRIX_CONTEXT: ${{ toJson(matrix) }}
+              run: echo $MATRIX_CONTEXT
+
+    context_testing:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Dump Github context
+              env: 
+                GITHUB_CONTEXT: ${{ toJson(github) }}
+              run: echo "$GITHUB_CONTEXT"
+
+            - name: Dump job context
+              env:
+                JOB_CONTEXT: ${{ toJson(job) }}
+              run: echo $JOB_CONTEXT
+
+            - name: Dump steps context
+              env:
+                STEPS_CONTEXT: ${{ toJson(steps) }}
+              run: echo $STEPS_CONTEXT
+
+            - name: Dump runner context
+              env:
+                RUNNER_CONTEXT: ${{ toJson(runner) }}
+              run: echo $RUNNER_CONTEXT
+
+            - name: Dump secrets context
+              env:
+                SECRETS_CONTEXT: ${{ toJson(secrets) }}
+              run: echo $SECRETS_CONTEXT
